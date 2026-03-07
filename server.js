@@ -17,8 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Static Files
-app.use(express.static(path.join(__dirname)));
-app.use(express.static(path.join(__dirname, 'HP')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/hotels', require('./backend/routes/hotels'));
@@ -28,7 +27,7 @@ app.use('/api/ai', require('./backend/routes/ai'));
 
 // Serve homepage for root route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'HP', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;

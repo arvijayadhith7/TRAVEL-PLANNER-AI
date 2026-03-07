@@ -1,66 +1,79 @@
-# Travel Planner AI
+# Tripsero AI ✈️
+### Modern AI-Powered Travel Planning Reimagined
 
-A full-stack web application for planning trips, managing attractions, and generating AI-powered itineraries.
+Tripsero is a professional-grade travel planning application that combines a stunning modern UI with advanced AI to craft personalized day-by-day itineraries in seconds.
 
-## Features
+![Logo](public/images/logo.png) (If logo exists)
 
-- **Interactive Trip Planning**: Search for hotels, activities, and restaurants.
-- **Trip Cart**: Add items to your itinerary and manage them in a central location.
-- **Budget Tracking**: Real-time budget calculation for your planned trip.
-- **AI-Powered Itineraries**: Generate personalized travel schedules.
-- **Premium UI**: Modern, responsive design with glassmorphism and vibrant gradients.
+## 🌟 Key Features
 
-## Tech Stack
+- **🤖 AI-Powered Itineraries**: Leveraging Google Gemini to generate logical, day-by-day travel schedules based on your preferences.
+- **🎨 Premium Unified UI**: A consistent, dark-first design system with glassmorphism, smooth animations, and persistent sidebar navigation.
+- **💰 Smart Budget Tracking**: Real-time spending analysis that categorizes your selections (Hotels, Spots, Food) and tracks them against your limit.
+- **🏨 Contextual Discovery**: Effortlessly browse curated hotels and attractions across diverse global destinations.
+- **📅 Interactive Timeline**: A detailed, scheduled view of your trip with transit times, meal slots, and map visualizations.
 
-- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript (Vanilla).
+## 🏗️ Project Architecture
+
+The project has been reorganized into a clean, professional structure:
+
+```text
+├── backend/            # Express.js REST API
+│   ├── models/         # Sequelize Database Models
+│   ├── routes/         # API Endpoints (Hotels, AI, etc.)
+│   └── config/         # Database and Environment Setup
+├── public/             # Optimized Static Frontend
+│   ├── css/            # Standardized Design System
+│   ├── js/             # Client-side Application Logic
+│   ├── images/         # High-resolution Assets
+│   └── index.html      # Central Dashboard Root
+├── scripts/            # Database Maintenance & AI Testing
+├── docs/               # Technical Specifications & API Docs
+└── server.js           # Main Entry Point
+```
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Vanila HTML5, CSS3 (Custom Properties), JavaScript (ES6+).
 - **Backend**: Node.js, Express.
-- **Database**: SQLite (managed via Sequelize ORM).
-- **AI**: Google Generative AI (Gemini).
+- **Database**: SQLite with Sequelize ORM.
+- **AI Engine**: Google Generative AI (Gemini Pro).
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js v18+
+- A Google Gemini API Key
 
-- Node.js (v18 or higher recommended)
-- npm
-
-### Installation
-
-1. Clone the repository:
+### Setup
+1. **Clone & Install**:
    ```bash
    git clone <repository-url>
-   cd TRAVEL-PLANNER-master
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
    ```
 
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add your Gemini API key:
-   ```text
+2. **Environment**:
+   Create a `.env` file in the root:
+   ```env
    GEMINI_API_KEY=your_api_key_here
-   PORT=5000
+   PORT=5001
    ```
 
-4. Seed the database:
+3. **Initialize Database**:
    ```bash
    npm run seed
    ```
 
-### Running the Project
+### Launch
+```bash
+npm start
+```
+Visit `http://localhost:5001` to start planning.
 
-1. Start the server:
-   ```bash
-   npm start
-   ```
-2. Open your browser and navigate to `http://localhost:5000` (or whichever port you configured).
-
-## Documentation
-
-For more detailed information, please refer to the following:
-
-- [API Documentation](docs/API.md)
+## 📜 Documentation
+- [API Reference](docs/API.md)
 - [Database Schema](docs/DATABASE.md)
 - [Frontend Logic](docs/FRONTEND.md)
+
+---
+*Created with ❤️ for travelers by arvijayadhith7*

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning Your Journey... - Tripsero</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Planning Your Trip...</title>
+    <link href="css/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
@@ -147,6 +147,7 @@
         .status-area {
             margin-top: 30px;
             height: 80px;
+            /* Fixed height to prevent layout shift */
         }
 
         .status-text {
@@ -154,7 +155,6 @@
             font-weight: 700;
             background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
             opacity: 0;
@@ -296,10 +296,10 @@
 
         <!-- Dynamic Text -->
         <div class="status-area">
-            <h2 class="status-text" id="mainStatus">Crafting Your Destination...</h2>
+            <h2 class="status-text" id="mainStatus">Initiating Travel Engine...</h2>
             <div class="sub-status">
                 <i class="fa-solid fa-circle-notch"></i>
-                <span id="subStatus">Scanning best local experiences</span>
+                <span id="subStatus">Connecting to global database</span>
             </div>
         </div>
 
@@ -313,14 +313,15 @@
     <!-- Container for flying icons -->
     <div class="flying-cards" id="flyingCards"></div>
 
-    <script src="database.js"></script>
-    <script src="app.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/app.js"></script>
     <script>
         const statusSteps = [
-            { main: "Analyzing Destinations...", sub: "Finding the perfect matches", duration: 1500 },
-            { main: "Sourcing Best Hotels...", sub: "Excluding low-rated options", duration: 1500 },
-            { main: "Personalizing Budget...", sub: "Maximizing value for your stay", duration: 1500 },
-            { main: "Finalizing Recommendations...", sub: "Preparing your travel board", duration: 1000 }
+            { main: "Drafting Your Itinerary...", sub: "Analyzing your preferences", duration: 1500 },
+            { main: "Checking Availability...", sub: "Scanning top-rated hotels", duration: 1500 },
+            { main: "Curating Experiences...", sub: "Finding hidden gems & local spots", duration: 1500 },
+            { main: "Optimizing Routes...", sub: "Calculating best travel times", duration: 1500 },
+            { main: "Final Polish...", sub: "Applying AI personalization", duration: 1000 }
         ];
 
         const icons = [
@@ -336,25 +337,30 @@
 
         function updateStatus() {
             if (currentStep >= statusSteps.length) {
+                // Complete
                 progressBar.style.width = '100%';
-                mainStatus.textContent = "Journey Ready!";
-                subStatus.innerHTML = "<i class='fa-solid fa-check-circle'></i> Taking you there...";
+                mainStatus.textContent = "Itinerary Ready!";
+                subStatus.innerHTML = "<i class='fa-solid fa-check-circle'></i> Redirecting...";
 
                 setTimeout(() => {
-                    // Redirect back to hotels.html (the original Flow from index.html)
-                    window.location.href = 'hotels.html';
+                    // Redirect to the actual itinerary page (which we should create or link to)
+                    // For now, let's redirect to a placeholder or back to summary if itinerary.html isn't ready
+                    // Based on previous convos, itinerary.html was the goal.
+                    window.location.href = 'itinerary.html';
                 }, 1000);
                 return;
             }
 
             const step = statusSteps[currentStep];
 
+            // Text Animation
             mainStatus.style.animation = 'none';
-            mainStatus.offsetHeight;
+            mainStatus.offsetHeight; /* trigger reflow */
             mainStatus.style.animation = 'fadeUp 0.5s forwards';
             mainStatus.textContent = step.main;
             subStatus.textContent = step.sub;
 
+            // Progress Bar
             const progress = ((currentStep + 1) / statusSteps.length) * 100;
             progressBar.style.width = `${progress}%`;
 
@@ -362,12 +368,14 @@
             setTimeout(updateStatus, step.duration);
         }
 
+        // Spawn flying icons randomly
         function spawnIcons() {
             const icon = document.createElement('div');
             icon.className = 'card-icon';
             icon.innerHTML = `<i class="fa-solid ${icons[Math.floor(Math.random() * icons.length)]}"></i>`;
 
-            const left = 20 + Math.random() * 60;
+            // Random position
+            const left = 20 + Math.random() * 60; // Keep somewhat central
             const top = 60 + Math.random() * 20;
 
             icon.style.left = `${left}%`;
@@ -376,6 +384,7 @@
 
             flyingCards.appendChild(icon);
 
+            // Cleanup
             setTimeout(() => icon.remove(), 2000);
 
             if (currentStep < statusSteps.length) {
@@ -383,6 +392,7 @@
             }
         }
 
+        // Start animations
         setTimeout(updateStatus, 500);
         spawnIcons();
 
