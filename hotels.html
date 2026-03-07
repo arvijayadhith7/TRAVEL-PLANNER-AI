@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore - Tripsero</title>
+    <link rel="stylesheet" href="hotels.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body data-page="hotels">
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="HP/index.html" class="logo-area">
+                <i class="fa-solid fa-leaf" style="color: var(--primary);"></i>
+                <span>Tripsero</span>
+            </a>
+
+            <nav class="nav-section">
+                <h4>Home</h4>
+                <a href="HP/index.html" class="nav-link">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hotels.html" class="nav-link active">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Hotels</span>
+                </a>
+                <a href="spots.html" class="nav-link">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                    <span>Spots</span>
+                </a>
+                <a href="tripcart.html" class="nav-link">
+                    <i class="fa-solid fa-suitcase-rolling"></i>
+                    <span>My Trip</span>
+                </a>
+            </nav>
+
+            <nav class="nav-section">
+                <h4>Settings</h4>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Preferences</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Support</span>
+                </a>
+            </nav>
+
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label class="filter-label">Destination</label>
+                    <input type="text" class="filter-input" id="destInput" placeholder="Where to?">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Budget</label>
+                    <select class="filter-input" id="budgetSelect">
+                        <option value="Budget">Budget</option>
+                        <option value="Midrange" selected>Midrange</option>
+                        <option value="Luxury">Luxury</option>
+                    </select>
+                </div>
+                <button class="update-btn" onclick="updateFilters()">Update Trip</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Stay in <span id="displayDest">Tokyo</span></h1>
+                    <p style="color: var(--text-secondary); margin-top: 4px;">94 recommendations matching your style</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search for hotels, sights..."
+                            oninput="handleSearch(this.value)">
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
+                            class="avatar" alt="User">
+                        <i class="fa-solid fa-chevron-down" style="font-size: 12px; color: var(--text-secondary);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="category-tabs">
+                <button class="tab-btn active" data-category="hotels">Hotels</button>
+                <button class="tab-btn" data-category="restaurants">Restaurants</button>
+            </div>
+
+            <div class="cards-grid" id="recommendationsGrid">
+                <!-- Cards injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Cart Toggle -->
+    <div class="cart-toggle" onclick="window.location.href='tripcart.html'">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>View My Trip</span>
+        <span class="cart-count-badge" id="floatingCartCount">0</span>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="app.js"></script>
+    <script>
+        let currentCategory = 'hotels';
+        let searchQuery = '';
+
+        async function renderRecommendations() {
+            const grid = document.getElementById('recommendationsGrid');
+            const tripData = TripPlanner.getTripData();
+
+            // Sync UI with trip data
+            document.getElementById('displayDest').textContent = tripData.destination || 'Destination';
+            document.getElementById('destInput').value = tripData.destination || '';
+            document.getElementById('budgetSelect').value = tripData.budgetType || 'Midrange';
+
+            let items = Database[currentCategory] || [];
+
+            // Filter by destination
+            if (tripData.destination) {
+                const dest = tripData.destination.toLowerCase();
+                items = items.filter(item =>
+                    item.location.toLowerCase().includes(dest) ||
+                    item.name.toLowerCase().includes(dest)
+                );
+            }
+
+            // Filter by search query
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                items = items.filter(item =>
+                    item.name.toLowerCase().includes(q) ||
+                    item.location.toLowerCase().includes(q)
+                );
+            }
+
+            // Budget filtering
+            const budgetType = tripData.budgetType || 'Midrange';
+            items = items.filter(item => {
+                if (budgetType === 'Budget') {
+                    if (currentCategory === 'hotels') return item.price <= 4000;
+                    return item.price <= 800;
+                }
+                if (budgetType === 'Midrange') {
+                    if (currentCategory === 'hotels') return item.price <= 10000;
+                    return item.price <= 2000;
+                }
+                return true;
+            });
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 100px; color: var(--text-secondary);">
+                    <i class="fa-solid fa-map-location-dot" style="font-size: 48px; margin-bottom: 20px; opacity: 0.2;"></i>
+                    <h3>No ${currentCategory} found</h3>
+                    <p>Try adjusting your destination or budget filters.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="explore-card">
+                    <div class="card-img-wrapper">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="match-badge">98% Match</div>
+                        <button class="fav-btn"><i class="fa-regular fa-heart"></i></button>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title-row">
+                            <h3>${item.name}</h3>
+                            <div class="card-rating">
+                                <i class="fa-solid fa-star"></i>
+                                <span>${item.rating || '4.5'}</span>
+                            </div>
+                        </div>
+                        <p class="card-location">${item.location}</p>
+                        <div class="card-footer">
+                            <div class="card-price">
+                                ₹${item.price.toLocaleString()}<span>/${currentCategory === 'hotels' ? 'night' : 'avg'}</span>
+                            </div>
+                            <button class="add-btn" onclick="addToTrip('${currentCategory}', '${item.id}', this)">
+                                Add to Trip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateCartCount();
+        }
+
+        async function addToTrip(cat, id, btn) {
+            const items = Database[cat];
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            await new Promise(resolve => setTimeout(resolve, 600));
+
+            const success = TripPlanner.addToCart(cat === 'sights' ? 'activities' : cat, {
+                ...item,
+                nights: TripPlanner.getTripData().duration || 5,
+                checkIn: TripPlanner.getTripData().startDate || 'Mar 10',
+                checkOut: TripPlanner.getTripData().endDate || 'Mar 15'
+            });
+
+            if (success) {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Added';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.background = '';
+                }, 2000);
+                updateCartCount();
+            } else {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function updateFilters() {
+            const dest = document.getElementById('destInput').value;
+            const budget = document.getElementById('budgetSelect').value;
+
+            const tripData = TripPlanner.getTripData();
+            tripData.destination = dest;
+            tripData.budgetType = budget;
+            TripPlanner.saveTripData(tripData);
+
+            renderRecommendations();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val;
+            renderRecommendations();
+        }
+
+        function updateCartCount() {
+            const count = TripPlanner.getCartItemCount();
+            document.getElementById('floatingCartCount').textContent = count;
+        }
+
+        // Tab events
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                renderRecommendations();
+            });
+        });
+
+        // Init
+        window.addEventListener('database-ready', renderRecommendations);
+        if (window.Database && window.Database.hotels.length > 0) renderRecommendations();
+    </script>
+</body>
+
+</html>

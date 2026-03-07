@@ -1,0 +1,20 @@
+{
+  "name": "travel-planner",
+  "version": "1.0.0",
+  "description": "Travel Planner AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node backend/seeder.js",
+    "seed:destroy": "node backend/seeder.js -d"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "colors": "^1.4.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
+  }
+}

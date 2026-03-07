@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Summary - Tripsero</title>
+    <link rel="stylesheet" href="tripcart.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body data-page="tripcart">
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="HP/index.html" class="logo-area">
+                <i class="fa-solid fa-leaf" style="color: var(--primary);"></i>
+                <span>Tripsero</span>
+            </a>
+
+            <nav class="nav-section">
+                <h4>Home</h4>
+                <a href="HP/index.html" class="nav-link">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hotels.html" class="nav-link">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Hotels</span>
+                </a>
+                <a href="spots.html" class="nav-link">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                    <span>Spots</span>
+                </a>
+                <a href="tripcart.html" class="nav-link active">
+                    <i class="fa-solid fa-suitcase-rolling"></i>
+                    <span>My Trip</span>
+                </a>
+            </nav>
+
+            <nav class="nav-section">
+                <h4>Settings</h4>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Preferences</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Support</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <span id="breadcrumbDest">Tokyo</span> Planner &nbsp; > &nbsp; <span>Checkout</span>
+                    </div>
+                    <h1>Review your trip summary</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
+                            class="avatar" alt="User">
+                        <i class="fa-solid fa-chevron-down" style="font-size: 12px; color: var(--text-secondary);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="cart-layout" id="cartLayout">
+                <!-- Left Content: Hotel and Spots -->
+                <div class="main-info">
+
+                    <!-- Selected Hotel -->
+                    <div class="cart-section" id="hotelSection">
+                        <div class="section-title">
+                            <span><i class="fa-solid fa-lock"></i> Selected Hotel</span>
+                            <a href="hotels.html" class="btn-link">Change</a>
+                        </div>
+                        <div id="hotelCardContainer">
+                            <!-- Dynamic Hotel Card -->
+                        </div>
+                    </div>
+
+                    <!-- Selected Spots -->
+                    <div class="cart-section">
+                        <div class="section-title">
+                            <span><i class="fa-regular fa-clock"></i> Selected Spots</span>
+                            <a href="spots.html" class="btn-link">Edit Route</a>
+                        </div>
+                        <div class="spots-list" id="spotsList">
+                            <!-- Dynamic Spots List -->
+                        </div>
+                        <a href="spots.html" class="add-more-spots">
+                            <i class="fa-solid fa-plus"></i> &nbsp; Add more spots to your itinerary
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Price Summary -->
+                <div class="sidebar-info">
+                    <div class="sidebar-card">
+                        <h2 class="sidebar-title">Price Summary</h2>
+
+                        <div id="priceDetails">
+                            <!-- Dynamic Price Rows -->
+                        </div>
+
+                        <div class="price-row total">
+                            <span>Total Trip Cost</span>
+                            <span class="total-price" id="totalDisplay">₹0</span>
+                        </div>
+
+                        <div class="budget-status-box">
+                            <div class="budget-header">
+                                <span>Trip Budget Status</span>
+                                <span id="budgetPercent">0% Used</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="budgetProgress" style="width: 0%;"></div>
+                            </div>
+                            <div class="budget-note" id="budgetNote">
+                                Loading budget data...
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" onclick="proceedToItinerary()">
+                            Proceed to Itinerary &nbsp; <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p class="cancel-note">Free cancellation for most bookings until Oct 10th.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="app.js"></script>
+    <script>
+        function renderCart() {
+            const cart = TripPlanner.getCart();
+            const tripData = TripPlanner.getTripData();
+            const hotelContainer = document.getElementById('hotelCardContainer');
+            const spotsList = document.getElementById('spotsList');
+            const priceDetails = document.getElementById('priceDetails');
+
+            document.getElementById('breadcrumbDest').textContent = tripData.destination || 'Tokyo';
+
+            // 1. Render Hotel
+            const hotel = cart.hotels[0]; // Take first selection
+            if (hotel) {
+                hotelContainer.innerHTML = `
+                    <div class="hotel-card">
+                        <img src="${hotel.image}" class="hotel-img" alt="${hotel.name}">
+                        <div class="hotel-details">
+                            <div style="display: flex; gap: 4px; color: #fbbf24; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                ${Array(5).fill(0).map((_, i) => `<i class="fa-solid fa-star"></i>`).join('')}
+                                <span style="color: var(--text-secondary); margin-left: 4px;">(452 reviews)</span>
+                            </div>
+                            <h3>${hotel.name}</h3>
+                            <div class="hotel-meta">
+                                <div><i class="fa-solid fa-location-dot"></i> ${hotel.location}</div>
+                                <div><i class="fa-regular fa-calendar"></i> ${tripData.startDate || 'Oct 12'} - ${tripData.endDate || 'Oct 16'} (${tripData.duration || 4} nights)</div>
+                                <div><i class="fa-solid fa-user-group"></i> ${tripData.travelers || 2} Adults</div>
+                            </div>
+                            <div class="hotel-price">₹${(hotel.price * (tripData.duration || 4)).toLocaleString()} <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">total</span></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                hotelContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No hotel selected. <a href="hotels.html" style="color: var(--primary);">Browse hotels</a></p>';
+            }
+
+            // 2. Render Spots
+            const activities = cart.activities || [];
+            if (activities.length > 0) {
+                spotsList.innerHTML = activities.map((spot, index) => {
+                    const transit = index < activities.length - 1 ? `
+                        <div class="transit-divider">
+                            <i class="fa-solid fa-person-walking"></i>
+                            ${20 + index * 5} MIN TRANSIT
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="spot-item">
+                            <div class="spot-info">
+                                <img src="${spot.image}" class="spot-img" alt="${spot.name}">
+                                <div class="spot-name-box">
+                                    <h4>${spot.name}</h4>
+                                    <p class="spot-location">${spot.location} • 2 hours stay</p>
+                                </div>
+                            </div>
+                            <div class="spot-price">${spot.price === 0 ? 'Free' : '₹' + spot.price.toLocaleString()}</div>
+                        </div>
+                        ${transit}
+                    `;
+                }).join('');
+            } else {
+                spotsList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No spots selected.</p>';
+            }
+
+            // 3. Price Summary
+            const hotelCost = hotel ? (hotel.price * (tripData.duration || 4)) : 0;
+            const foodCost = (tripData.duration || 4) * 3500; // Est. 3500 per day
+            const spotsCost = activities.reduce((sum, s) => sum + s.price, 0);
+            const serviceFee = 850;
+            const total = hotelCost + foodCost + spotsCost + serviceFee;
+
+            priceDetails.innerHTML = `
+                <div class="price-row">
+                    <span>Hotels (${tripData.duration || 4} nights)</span>
+                    <span>₹${hotelCost.toLocaleString()}</span>
+                </div>
+                <div class="price-row">
+                    <span>Est. Food Cost <i class="fa-solid fa-circle-info"></i></span>
+                    <span>₹${foodCost.toLocaleString()}</span>
+                </div>
+                <div class="price-row">
+                    <span>Activity Tickets</span>
+                    <span>₹${spotsCost.toLocaleString()}</span>
+                </div>
+                <div class="price-row">
+                    <span>Platform Service Fee</span>
+                    <span>₹${serviceFee.toLocaleString()}</span>
+                </div>
+            `;
+
+            document.getElementById('totalDisplay').textContent = `₹${total.toLocaleString()}`;
+
+            // 4. Budget Status
+            const budget = tripData.budget || 100000;
+            const percent = Math.min(Math.round((total / budget) * 100), 100);
+            const remaining = budget - total;
+
+            document.getElementById('budgetPercent').textContent = `${percent}% Used`;
+            document.getElementById('budgetProgress').style.width = `${percent}%`;
+
+            if (remaining > 0) {
+                document.getElementById('budgetNote').innerHTML = `Great news! You are still <strong>₹${remaining.toLocaleString()}</strong> under your initial ₹${budget.toLocaleString()} budget for this ${tripData.destination || 'trip'}.`;
+            } else {
+                document.getElementById('budgetNote').innerHTML = `You have exceeded your budget by <strong>₹${Math.abs(remaining).toLocaleString()}</strong>. Consider removing some items or adjusting expenses.`;
+                document.getElementById('budgetProgress').style.background = '#ef4444';
+            }
+        }
+
+        function proceedToItinerary() {
+            TripPlanner.showNotification('Redirecting to your full itinerary...', 'success');
+            setTimeout(() => {
+                window.location.href = 'itinerary.html';
+            }, 1000);
+        }
+
+        // Initialize
+        renderCart();
+    </script>
+</body>
+
+</html>

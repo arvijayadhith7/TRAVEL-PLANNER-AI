@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Itinerary - Tripsero</title>
+    <link rel="stylesheet" href="itinerary.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body data-page="itinerary">
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="HP/index.html" class="logo-area">
+                <i class="fa-solid fa-leaf" style="color: var(--primary);"></i>
+                <span>Tripsero</span>
+            </a>
+
+            <nav class="nav-section">
+                <h4>Home</h4>
+                <a href="HP/index.html" class="nav-link">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hotels.html" class="nav-link">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Hotels</span>
+                </a>
+                <a href="spots.html" class="nav-link">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                    <span>Spots</span>
+                </a>
+                <a href="tripcart.html" class="nav-link">
+                    <i class="fa-solid fa-suitcase-rolling"></i>
+                    <span>My Trip</span>
+                </a>
+            </nav>
+
+            <nav class="nav-section">
+                <h4>Settings</h4>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Preferences</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Support</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Your <span id="displayDest">Tamil Nadu</span> Itinerary</h1>
+                    <div class="header-meta">
+                        <div class="meta-item">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span id="displayDates">Mar 10 - Mar 15</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span id="displayGroup">2 Adults</span>
+                        </div>
+                        <div class="meta-item" style="color: var(--primary); font-weight: 700;">
+                            <i class="fa-solid fa-札"></i>
+                            <span id="displayBudget">Midrange Budget</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i>
+                            PDF</button>
+                        <button class="btn-action"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Day Tabs -->
+            <div class="day-tabs" id="dayTabs">
+                <!-- Tabs injected here -->
+            </div>
+
+            <!-- Main Layout Grid -->
+            <div class="itinerary-layout">
+                <!-- Timeline -->
+                <div class="timeline-container" id="itineraryContent">
+                    <!-- Day sections injected here -->
+                </div>
+
+                <!-- Map Sidebar Mockup -->
+                <aside class="itinerary-sidebar">
+                    <div class="map-card">
+                        <div class="map-header">
+                            <h3>Trip Visualization</h3>
+                            <i class="fa-solid fa-expand" style="color: var(--text-secondary); cursor: pointer;"></i>
+                        </div>
+                        <div class="map-content" id="mapView">
+                            <!-- Pins injected here -->
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="app.js"></script>
+    <script>
+        function initializeItinerary() {
+            const cart = TripPlanner.getCart();
+            const tripData = TripPlanner.getTripData();
+            const duration = tripData.duration || 5;
+            const destination = tripData.destination || 'Destination';
+
+            document.getElementById('displayDest').textContent = destination;
+            document.getElementById('displayDates').textContent = `${tripData.startDate || 'Mar 10'} - ${tripData.endDate || 'Mar 15'} (${duration} days)`;
+            document.getElementById('displayGroup').textContent = `${tripData.travelers || 2} ${tripData.travelers === 1 ? 'Person' : 'People'}`;
+            document.getElementById('displayBudget').textContent = `${tripData.budgetType || 'Midrange'} Budget`;
+
+            renderTabs(duration);
+            renderTimeline(cart, duration);
+            renderMap(cart);
+        }
+
+        function renderTabs(days) {
+            const container = document.getElementById('dayTabs');
+            let tabsHtml = `<button class="tab-btn active" onclick="scrollToDay('all')">Full Trip</button>`;
+
+            for (let i = 1; i <= days; i++) {
+                tabsHtml += `<button class="tab-btn" onclick="scrollToDay(${i})">Day ${i}</button>`;
+            }
+            container.innerHTML = tabsHtml;
+        }
+
+        function renderTimeline(cart, days) {
+            const container = document.getElementById('itineraryContent');
+            const activities = cart.activities || [];
+            const hotel = cart.hotels && cart.hotels[0];
+
+            let html = '';
+
+            for (let day = 1; day <= days; day++) {
+                const dayActivities = activities.filter((_, idx) => (idx % days) + 1 === day);
+
+                html += `
+                <section class="day-section" id="day-${day}">
+                    <div class="day-header">
+                        <h2>Day ${day} Overview</h2>
+                        <span style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 600;">Main Focus: Exploration</span>
+                    </div>
+                    
+                    <div class="timeline">
+                `;
+
+                if (day === 1 && hotel) {
+                    html += renderTimelineItem('09:00 AM', 'ACCOMMODATION', hotel.name, 'Check-in and settlement at your chosen stay.', hotel.image);
+                } else if (day > 1 && hotel) {
+                    html += renderTimelineItem('08:30 AM', 'BREAKFAST', 'Hotel Breakfast', 'Fuel up for the day ahead.', hotel.image);
+                }
+
+                dayActivities.forEach((act, idx) => {
+                    const hour = 10 + (idx * 3);
+                    const timeStr = `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+
+                    html += `
+                        <div class="transit-node">
+                            <i class="fa-solid fa-car-side"></i>
+                            <span>20-30 min transit through the city hub</span>
+                        </div>
+                    `;
+                    html += renderTimelineItem(timeStr, act.tags ? act.tags[0] : 'SIGHTS', act.name, act.location || 'Local area exploration.', act.image);
+                });
+
+                if (day === days && hotel) {
+                    html += renderTimelineItem('06:00 PM', 'DEPARTURE', 'Wrap up', 'Final souvenirs and heading to the exit point.', hotel.image);
+                } else {
+                    html += renderTimelineItem('07:30 PM', 'DINNER', 'Local Delicacies', 'Try out popular local restaurants nearby.', 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400');
+                }
+
+                html += `
+                    </div>
+                </section>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderTimelineItem(time, tag, title, desc, img) {
+            return `
+                <div class="timeline-item">
+                    <span class="timeline-time">${time}</span>
+                    <div class="timeline-marker"></div>
+                    <div class="activity-card">
+                        <img src="${img}" class="activity-img" alt="${title}">
+                        <div class="activity-content">
+                            <span class="activity-tag">${tag}</span>
+                            <h3>${title}</h3>
+                            <p class="activity-desc">${desc}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMap(cart) {
+            const mapView = document.getElementById('mapView');
+            const activities = cart.activities || [];
+            const hotel = cart.hotels && cart.hotels[0];
+
+            let mapHtml = '';
+
+            if (hotel) {
+                mapHtml += `
+                    <div class="map-pin" style="top: 45%; left: 45%; background: #0f172a;">
+                        <i class="fa-solid fa-hotel"></i>
+                        <span class="map-pin-label">Your Stay</span>
+                    </div>
+                `;
+            }
+
+            activities.forEach((act, idx) => {
+                const angle = (idx / activities.length) * 2 * Math.PI;
+                const radius = 150 + (Math.random() * 50);
+                const x = 50 + (Math.cos(angle) * 35);
+                const y = 50 + (Math.sin(angle) * 35);
+
+                mapHtml += `
+                    <div class="map-pin" style="top: ${y}%; left: ${x}%;">
+                        <i class="fa-solid fa-camera"></i>
+                        <span class="map-pin-label">${act.name}</span>
+                    </div>
+                `;
+            });
+
+            mapView.innerHTML = mapHtml;
+        }
+
+        function scrollToDay(day) {
+            if (day === 'all') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                const el = document.getElementById(`day-${day}`);
+                if (el) {
+                    const y = el.getBoundingClientRect().top + window.pageYOffset - 100;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === (day === 'all' ? 'Full Trip' : `Day ${day}`));
+            });
+        }
+
+        window.addEventListener('load', initializeItinerary);
+    </script>
+</body>
+
+</html>
