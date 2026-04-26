@@ -139,7 +139,8 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding-bottom: 60px;
+    padding-bottom: 120px; /* Increased bottom padding to lift content */
+    margin-top: -40px; /* Lift whole section */
 }
 
 .badge-pill {
@@ -171,7 +172,7 @@ body {
     font-size: 18px;
     color: #94a3b8;
     max-width: 500px;
-    margin-bottom: 48px;
+    margin-bottom: 32px; /* Reduced from 48px */
 }
 
 /* Search Bar Container */

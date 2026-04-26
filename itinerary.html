@@ -702,6 +702,71 @@
             padding: 2px 8px;
             border-radius: 4px;
         }
+        .ai-moment-card {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 2px solid #5eead4;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0 20px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(20, 184, 166, 0.1);
+        }
+
+        .ai-moment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #14b8a6;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .ai-moment-content {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .ai-moment-info h4 {
+            font-size: 18px;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .ai-moment-info p {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .ai-moment-tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: #0d9488;
+            background: rgba(20, 184, 166, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .ai-moment-image {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .ai-moment-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .meter-card {
             text-align: center;
         }
@@ -1214,6 +1279,27 @@
                 html += createActivityCard('dining', restaurant.name, restaurant.location, time, restaurant.price, restaurant.image);
             });
 
+            // 4. Personalized AI Moment (LOVE MOMENTS for Couples)
+            const travelStyle = TripPlanner.getTripData().travelStyle || 'Solo';
+            const aiMoment = getPersonalizedMoment(travelStyle, dayIndex);
+            if (aiMoment) {
+                html += `
+                    <div class="ai-moment-card">
+                        <div class="ai-moment-badge"><i class="fa-solid fa-sparkles"></i> AI-CURATED MOMENT</div>
+                        <div class="ai-moment-content">
+                            <div class="ai-moment-info">
+                                <h4>${aiMoment.title}</h4>
+                                <p>${aiMoment.desc}</p>
+                                <span class="ai-moment-tag">${aiMoment.tag}</span>
+                            </div>
+                            <div class="ai-moment-image">
+                                <img src="${aiMoment.image}" alt="${aiMoment.title}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Update Sidebar Distance (only for Day 1 or current day in real app)
             if (dayIndex === 0) {
                 setTimeout(() => {
@@ -1237,6 +1323,33 @@
             }
             // Return distance between 0.5 and 8.5 km
             return 0.5 + (Math.abs(hash) % 80) / 10;
+        }
+
+        // Personalized Moments Generator
+        function getPersonalizedMoment(style, dayIndex) {
+            // Only suggest one moment per day
+            const moments = {
+                'Romantic': [
+                    { title: "Sunset Romance at Marina", desc: "A private stroll as the sky turns golden, perfect for love moments.", tag: "COUPLE FAVORITE", image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=300" },
+                    { title: "Candlelight Rooftop Dinner", desc: "Private dining overlooking the city lights with personalized service.", tag: "TOP RATED FOR LOVE", image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=300" }
+                ],
+                'Honeymoon': [
+                    { title: "Flower Path Surprise", desc: "A curated flower-decorated trail at your destination hotel.", tag: "EXCLUSIVE MOMENT", image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=300" },
+                    { title: "Couple's Spa Retreat", desc: "A rejuvenating 90-minute aromatherapy session together.", tag: "RELAXATION", image: "https://images.unsplash.com/photo-1544161515-4508f8ad06d4?w=300" }
+                ],
+                'Family': [
+                    { title: "Interactive Workshop", desc: "Local craft making that kids and parents will both enjoy.", tag: "KIDS FRIENDLY", image: "https://images.unsplash.com/photo-1502086223501-7ea2443944b1?w=300" }
+                ],
+                'Friends': [
+                    { title: "Secret Night Trek", desc: "Explore the hidden paths with a private guide and bonfire.", tag: "ADVENTURE", image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84c?w=300" }
+                ],
+                'Solo': [
+                    { title: "Photography Zen Walk", desc: "Best spots for capturing the local soul in complete peace.", tag: "CREATIVE", image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=300" }
+                ]
+            };
+
+            const styleMoments = moments[style] || moments['Solo'];
+            return styleMoments[dayIndex % styleMoments.length];
         }
 
         function createActivityCard(type, title, location, time, price, image) {
@@ -1338,7 +1451,7 @@
             gsap.from(".trip-header", { y: -30, opacity: 0, duration: 0.6, delay: 0.2, ease: "power2.out" });
             
             // Scroll-triggered timeline reveal
-            gsap.utils.toArray(".timeline-item, .travel-connector").forEach(item => {
+            gsap.utils.toArray(".timeline-item, .travel-connector, .ai-moment-card").forEach(item => {
                 gsap.from(item, {
                     x: -30,
                     opacity: 0,
@@ -1350,6 +1463,17 @@
                         toggleActions: "play none none none"
                     }
                 });
+
+                // Add special pulse for AI moments
+                if (item.classList.contains('ai-moment-card')) {
+                    gsap.to(item, {
+                        boxShadow: "0 10px 30px rgba(20, 184, 166, 0.4)",
+                        duration: 1.5,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut"
+                    });
+                }
             });
 
             // Active Nav Tracking on Scroll

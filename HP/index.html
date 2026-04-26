@@ -120,6 +120,7 @@
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "M j, Y",
+            static: true,
             onClose: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
