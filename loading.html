@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crafting Your Journey... - Tripsero</title>
+    <link rel="stylesheet" href="global.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .loading-container {
+            text-align: center;
+            z-index: 10;
+            perspective: 1000px;
+        }
+
+        .travel-loader {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 40px;
+        }
+
+        .orbit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px dashed rgba(34, 197, 94, 0.2);
+            border-radius: 50%;
+        }
+
+        .plane-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .plane-icon {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(90deg);
+            color: #22c55e;
+            font-size: 28px;
+            filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.6));
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .status-wrapper {
+            margin-top: 20px;
+        }
+
+        .status-text {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sub-status {
+            font-size: 16px;
+            color: #94a3b8;
+            height: 24px;
+            font-weight: 500;
+        }
+
+        .progress-bar-container {
+            width: 320px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin: 40px auto 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .background-blobs {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            filter: blur(80px);
+            opacity: 0.4;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background-blobs" id="blobs">
+        <div class="blob" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
+        <div class="blob" style="width: 400px; height: 400px; bottom: -150px; right: -150px; background: #16a34a;"></div>
+    </div>
+
+    <div class="loading-container">
+        <div class="travel-loader">
+            <div class="orbit"></div>
+            <div class="plane-wrapper" id="planeWrapper">
+                <i class="fa-solid fa-paper-plane plane-icon"></i>
+            </div>
+            <div class="center-circle" id="centerCircle">
+                <i class="fa-solid fa-earth-americas"></i>
+            </div>
+        </div>
+
+        <div class="status-wrapper">
+            <div class="status-text" id="mainStatus">Designing Your Escape</div>
+            <div class="sub-status" id="subStatus">Curating local experiences...</div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        const statusItems = [
+            "Analyzing Tamil Nadu destinations...",
+            "Scouting hidden hill station gems...",
+            "Checking heritage hotel availability...",
+            "Matching locations to your budget...",
+            "Generating personalized insights...",
+            "Finalizing your Tripsero itinerary...",
+            "Ready for takeoff!"
+        ];
+
+        // GSAP Animations
+        // 1. Constant Plane Rotation
+        gsap.to("#planeWrapper", {
+            rotation: 360,
+            duration: 4,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // 2. Earth Pulse
+        gsap.to("#centerCircle", {
+            scale: 1.15,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // 3. Background Blobs Movement
+        gsap.to(".blob", {
+            x: "random(-100, 100)",
+            y: "random(-100, 100)",
+            duration: 10,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            stagger: 2
+        });
+
+        // 4. Progress Logic
+        const progressBar = document.getElementById('progressBar');
+        const subStatus = document.getElementById('subStatus');
+        const mainStatus = document.getElementById('mainStatus');
+        let currentStep = 0;
+
+        const updateProgress = () => {
+            if (currentStep < statusItems.length) {
+                // Update Sub Status with Fade
+                gsap.to(subStatus, {
+                    opacity: 0,
+                    y: -10,
+                    duration: 0.3,
+                    onComplete: () => {
+                        subStatus.innerText = statusItems[currentStep];
+                        gsap.to(subStatus, { opacity: 1, y: 0, duration: 0.3 });
+                    }
+                });
+
+                // Update Progress Bar
+                const progress = ((currentStep + 1) / statusItems.length) * 100;
+                gsap.to(progressBar, {
+                    width: `${progress}%`,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+
+                currentStep++;
+                setTimeout(updateProgress, 1500);
+            } else {
+                // Final Transition
+                gsap.to(".loading-container", {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 0.5,
+                    delay: 0.5,
+                    onComplete: () => {
+                        window.location.href = 'hotels.html';
+                    }
+                });
+            }
+        };
+
+        // Start the sequence
+        setTimeout(updateProgress, 500);
+
+        // Entrance animation for the whole container
+        gsap.from(".loading-container", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        });
+    </script>
+</body>
+
+</html>
