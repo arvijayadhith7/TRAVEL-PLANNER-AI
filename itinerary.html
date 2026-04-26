@@ -1491,6 +1491,17 @@
                     }
                 });
             });
+
+            // Handle Booking Button
+            document.querySelector('.btn-book').addEventListener('click', () => {
+                const btn = document.querySelector('.btn-book');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Finalizing...';
+                btn.style.background = '#0d9488';
+                
+                setTimeout(() => {
+                    window.location.href = 'confirmation.html';
+                }, 1500);
+            });
         }
 
         // Check if cart has items
