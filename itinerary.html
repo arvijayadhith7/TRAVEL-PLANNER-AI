@@ -680,6 +680,164 @@
                 display: none;
             }
         }
+        .travel-connector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 10px 14px;
+            padding-left: 20px;
+            border-left: 2px dashed #cbd5e1;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .travel-connector i {
+            color: #22c55e;
+            font-size: 14px;
+        }
+
+        .travel-connector span {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .meter-card {
+            text-align: center;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .route-breakdown {
+            margin-top: 20px;
+            text-align: left;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 16px;
+        }
+
+        .route-breakdown h4 {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .route-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .route-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .route-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .route-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #334155;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .route-item .spot-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .route-item .spot-dist {
+            color: #22c55e;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .vibe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .vibe-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .vibe-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .vibe-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .vibe-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .dist-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            color: #4ade80;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
     </style>
 </head>
 
@@ -792,10 +950,10 @@
                 <div class="distance-bar">
                     <div class="distance-label">
                         <span>Daily Distance</span>
-                        <span>4.2km</span>
+                        <span id="dailyDistanceDisplay" style="font-weight: 800; font-size: 1.2em; color: #22c55e;">0.0 km</span>
                     </div>
-                    <div class="distance-track">
-                        <div class="distance-fill"></div>
+                    <div class="distance-track" style="height: 10px; background: #f1f5f9; border-radius: 5px; margin-top: 8px;">
+                        <div class="distance-fill" id="distanceFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 5px; transition: width 1s ease-out;"></div>
                     </div>
                 </div>
             </div>
@@ -807,7 +965,36 @@
                     </div>
                     <div class="tip-content">
                         <h4 style="color: #0284c7;">Tripsero Pro Tip</h4>
-                        <p>Early morning visits to local sights often reveal hidden rituals and offer better photos without the crowds. Plan for a 6:00 AM start!</p>
+                        <p id="dynamicProTip">Early morning visits to local sights often reveal hidden rituals and offer better photos without the crowds. Plan for a 6:00 AM start!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Distance Meter Card (Replacing Local Vibe) -->
+            <div class="sidebar-card meter-card">
+                <h3><i class="fa-solid fa-gauge-high"></i> Distance Meter</h3>
+                <div class="gauge-container">
+                    <svg viewBox="0 0 100 50" class="gauge-svg">
+                        <path d="M 10 45 A 35 35 0 0 1 90 45" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M 10 45 A 35 35 0 0 1 90 45" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round" 
+                              stroke-dasharray="125.6" stroke-dashoffset="125.6" id="gaugeProgress" style="transition: stroke-dashoffset 1.5s ease-out;"/>
+                    </svg>
+                    <div class="gauge-value" id="gaugeText">0.0 km</div>
+                </div>
+                <div class="vibe-grid">
+                    <div class="vibe-item">
+                        <div class="vibe-label">Estimated Time</div>
+                        <div class="vibe-value" id="travelTime"><i class="fa-solid fa-car"></i> 45m</div>
+                    </div>
+                    <div class="vibe-item">
+                        <div class="vibe-label">Stops</div>
+                        <div class="vibe-value" id="stopCount">4 Spots</div>
+                    </div>
+                </div>
+                <div class="route-breakdown">
+                    <h4><i class="fa-solid fa-route"></i> Route Details</h4>
+                    <div id="routeList" class="route-list">
+                        <!-- Individual distances will be listed here -->
                     </div>
                 </div>
             </div>
@@ -816,6 +1003,7 @@
     </div>
 
     <script src="database.js"></script>
+    <script src="tamilnadu-tourism-db.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="app.js"></script>
@@ -870,13 +1058,33 @@
 
             document.getElementById('guestCountDisplay').textContent = travelers;
 
+            // Update Distance Meter
+            updateDistanceMeter();
+
             // Generate day navigation
             const dayNavList = document.getElementById('dayNavList');
             dayNavList.innerHTML = '';
             for (let i = 0; i < days; i++) {
                 const dayNav = document.createElement('div');
                 dayNav.className = `day-nav-item ${i === 0 ? 'active' : ''}`;
-                dayNav.innerHTML = `<i class="fa-regular fa-calendar"></i> Day ${i + 1}: ${getDayTitle(i)}`;
+                dayNav.id = `nav-day-${i}`;
+                dayNav.innerHTML = `<i class="fa-regular fa-calendar"></i> Day ${i + 1}: ${getDayTitle(i, tripData.destination)}`;
+                
+                // Add click handler to scroll to day
+                dayNav.addEventListener('click', () => {
+                    const target = document.getElementById(`day-section-${i}`);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Update active state
+                        document.querySelectorAll('.day-nav-item').forEach(n => n.classList.remove('active'));
+                        dayNav.classList.add('active');
+                    }
+                });
+                
                 dayNavList.appendChild(dayNav);
             }
 
@@ -890,8 +1098,30 @@
             }
         }
 
-        function getDayTitle(dayIndex) {
-            const titles = ['Arrival & City Views', 'Art & History', 'Versailles Day Trip', 'Local Exploration', 'Food Tour', 'Shopping & Culture', 'Departure'];
+        function getDayTitle(dayIndex, destination = '') {
+            const isParis = destination.toLowerCase().includes('paris') || destination.toLowerCase().includes('france');
+            
+            const genericTitles = [
+                'Arrival & Exploration', 
+                'Local Culture & Sights', 
+                'Hidden Gems Tour', 
+                'Authentic Experience', 
+                'Market & Food Walk', 
+                'Photography Tour', 
+                'Final Souvenirs & Departure'
+            ];
+            
+            const parisTitles = [
+                'Arrival & Seine Views', 
+                'Art & History at Louvre', 
+                'Versailles Day Trip', 
+                'Montmartre Magic', 
+                'Eiffel Tower Evening', 
+                'Fashion & Shopping', 
+                'Departure'
+            ];
+            
+            const titles = isParis ? parisTitles : genericTitles;
             return titles[dayIndex % titles.length];
         }
 
@@ -908,10 +1138,10 @@
             const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
             section.innerHTML = `
-                <div class="day-header">
+                <div class="day-header" id="day-section-${dayIndex}">
                     <div class="day-number">${dayIndex + 1}</div>
                     <div class="day-info">
-                        <h2>Day ${dayIndex + 1}: ${getDayTitle(dayIndex)}</h2>
+                        <h2>Day ${dayIndex + 1}: ${getDayTitle(dayIndex, tripData.destination)}</h2>
                         <p>${dateStr}</p>
                     </div>
                 </div>
@@ -931,11 +1161,12 @@
             let html = '';
             const travelers = TripPlanner.getTripData().travelers || 1;
             const totalDays = TripPlanner.getTripData().duration || 5;
+            let dayDistance = 0;
+
+            const hotel = cart.hotels.length > 0 ? cart.hotels[0] : null;
 
             // 1. Hotels: Show the hotel for the current day
-            // For now, we assume the same hotel for the whole trip, but we show it as a "Stay at" on all days
-            if (cart.hotels.length > 0) {
-                const hotel = cart.hotels[0];
+            if (hotel) {
                 if (dayIndex === 0) {
                     html += createActivityCard('hotel', hotel.name, hotel.location, '03:00 PM - Check-in', hotel.price, hotel.image);
                 } else {
@@ -944,7 +1175,6 @@
             }
 
             // 2. Activities: Distribute activities across days
-            // If we have 14 activities for 7 days, show 2 per day.
             const activities = cart.activities || [];
             const activitiesPerDay = Math.ceil(activities.length / totalDays);
             const startIdx = dayIndex * activitiesPerDay;
@@ -953,11 +1183,19 @@
 
             dayActivities.forEach((activity, idx) => {
                 const time = idx === 0 ? '09:00 AM - 12:00 PM' : '02:00 PM - 05:00 PM';
-                html += `<div class="travel-connector"><i class="fa-solid fa-person-walking"></i> Travel to ${activity.name}</div>`;
+                
+                // Calculate distance from hotel
+                const dist = getSimulatedDistance(hotel ? hotel.name : '', activity.name);
+                dayDistance += dist;
+                
+                html += `<div class="travel-connector">
+                            <i class="fa-solid fa-car-side"></i> 
+                            <span>${dist.toFixed(1)} km from ${hotel ? hotel.name : 'start'}</span>
+                         </div>`;
                 html += createActivityCard('sightseeing', activity.name, activity.location, time, activity.price * travelers, activity.image);
             });
 
-            // 3. Restaurants: Distribute restaurants across days
+            // 3. Restaurants
             const restaurants = cart.restaurants || [];
             const restaurantsPerDay = Math.ceil(restaurants.length / totalDays);
             const rStartIdx = dayIndex * restaurantsPerDay;
@@ -966,11 +1204,39 @@
 
             dayRestaurants.forEach((restaurant, idx) => {
                 const time = idx === 0 ? '12:30 PM - 01:45 PM' : '07:30 PM - 09:00 PM';
-                html += `<div class="travel-connector"><i class="fa-solid fa-utensils"></i> Meal at ${restaurant.name}</div>`;
+                const dist = getSimulatedDistance(hotel ? hotel.name : '', restaurant.name);
+                dayDistance += dist;
+
+                html += `<div class="travel-connector">
+                            <i class="fa-solid fa-utensils"></i> 
+                            <span>${dist.toFixed(1)} km from ${hotel ? hotel.name : 'start'}</span>
+                         </div>`;
                 html += createActivityCard('dining', restaurant.name, restaurant.location, time, restaurant.price, restaurant.image);
             });
 
+            // Update Sidebar Distance (only for Day 1 or current day in real app)
+            if (dayIndex === 0) {
+                setTimeout(() => {
+                    document.getElementById('dailyDistanceDisplay').textContent = `${dayDistance.toFixed(1)} km`;
+                    const percentage = Math.min((dayDistance / 15) * 100, 100); // 15km as max for bar
+                    document.getElementById('distanceFill').style.width = `${percentage}%`;
+                }, 500);
+            }
+
             return html;
+        }
+
+        // Simulated Distance Helper
+        function getSimulatedDistance(p1, p2) {
+            // Generates a deterministic but varied distance based on names
+            const combined = p1 + p2;
+            let hash = 0;
+            for (let i = 0; i < combined.length; i++) {
+                hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+                hash |= 0;
+            }
+            // Return distance between 0.5 and 8.5 km
+            return 0.5 + (Math.abs(hash) % 80) / 10;
         }
 
         function createActivityCard(type, title, location, time, price, image) {
@@ -1012,10 +1278,57 @@
                         </div>
                         <div class="activity-image">
                             <img src="${displayImage}" alt="${title}" onerror="this.src='${fallbacks.sightseeing}'">
+                            ${type !== 'hotel' ? `<div class="dist-badge"><i class="fa-solid fa-person-walking"></i> PROXIMITY</div>` : ''}
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        function updateDistanceMeter() {
+            const tripData = TripPlanner.getTripData();
+            const cart = TripPlanner.getCart();
+            let totalDist = 0;
+            const hotel = cart.hotels[0];
+
+            // Calculate total simulated distance
+            cart.activities.forEach(a => totalDist += getSimulatedDistance(hotel ? hotel.name : '', a.name));
+            cart.restaurants.forEach(r => totalDist += getSimulatedDistance(hotel ? hotel.name : '', r.name));
+
+            // Update Meter UI
+            const gauge = document.getElementById('gaugeProgress');
+            const text = document.getElementById('gaugeText');
+            const time = document.getElementById('travelTime');
+            const stops = document.getElementById('stopCount');
+
+            if (gauge) {
+                text.textContent = `${totalDist.toFixed(1)} km`;
+                
+                const maxDist = 40; // Increased max for larger itineraries
+                const percentage = Math.min(totalDist / maxDist, 1);
+                const offset = 125.6 * (1 - percentage);
+                gauge.style.strokeDashoffset = offset;
+
+                // Update sub-stats
+                time.innerHTML = `<i class="fa-solid fa-car"></i> ${Math.round(totalDist * 8)}m`;
+                stops.textContent = `${cart.activities.length + cart.restaurants.length} Spots`;
+
+                // Generate Route Breakdown List
+                const routeList = document.getElementById('routeList');
+                routeList.innerHTML = '';
+                
+                const allSpots = [...cart.activities, ...cart.restaurants];
+                allSpots.forEach(spot => {
+                    const dist = getSimulatedDistance(hotel ? hotel.name : '', spot.name);
+                    const item = document.createElement('div');
+                    item.className = 'route-item';
+                    item.innerHTML = `
+                        <span class="spot-name">${spot.name}</span>
+                        <span class="spot-dist">${dist.toFixed(1)} km</span>
+                    `;
+                    routeList.appendChild(item);
+                });
+            }
         }
 
         function initAnimations() {
@@ -1025,7 +1338,7 @@
             gsap.from(".trip-header", { y: -30, opacity: 0, duration: 0.6, delay: 0.2, ease: "power2.out" });
             
             // Scroll-triggered timeline reveal
-            gsap.utils.toArray(".timeline-item").forEach(item => {
+            gsap.utils.toArray(".timeline-item, .travel-connector").forEach(item => {
                 gsap.from(item, {
                     x: -30,
                     opacity: 0,
@@ -1033,8 +1346,24 @@
                     ease: "power2.out",
                     scrollTrigger: {
                         trigger: item,
-                        start: "top 85%",
+                        start: "top 90%",
                         toggleActions: "play none none none"
+                    }
+                });
+            });
+
+            // Active Nav Tracking on Scroll
+            gsap.utils.toArray(".day-section").forEach((section, i) => {
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top 200px",
+                    end: "bottom 200px",
+                    onToggle: self => {
+                        if (self.isActive) {
+                            document.querySelectorAll('.day-nav-item').forEach(n => n.classList.remove('active'));
+                            const navItem = document.getElementById(`nav-day-${i}`);
+                            if (navItem) navItem.classList.add('active');
+                        }
                     }
                 });
             });

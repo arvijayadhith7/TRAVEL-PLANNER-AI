@@ -117,31 +117,148 @@
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
         }
 
-        .background-blobs {
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pref-modal {
+            background: white;
+            width: 90%;
+            max-width: 480px;
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            color: #1e293b;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .pref-modal h2 {
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 24px;
+            color: #0f172a;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+        }
+
+        .option-item.selected {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option-dot {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            position: relative;
+            background: white;
+        }
+
+        .option-item.selected .option-dot {
+            border-color: #22c55e;
+            background: #22c55e;
+        }
+
+        .option-item.selected .option-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .option-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .btn-next {
+            width: 100%;
+            background: #14b8a6; /* Teal color from image */
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-next:hover {
+            background: #0d9488;
+            transform: translateY(-2px);
+        }
+
+        .atmosphere {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
             z-index: 1;
-            filter: blur(80px);
-            opacity: 0.4;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            background: #22c55e;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="background-blobs" id="blobs">
-        <div class="blob" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
-        <div class="blob" style="width: 400px; height: 400px; bottom: -150px; right: -150px; background: #16a34a;"></div>
-    </div>
+    <!-- Background Atmosphere -->
+    <div class="atmosphere"></div>
 
     <div class="loading-container">
         <div class="travel-loader">
@@ -161,6 +278,45 @@
 
         <div class="progress-bar-container">
             <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- AI Preference Modal -->
+    <div class="modal-overlay" id="prefModalOverlay">
+        <div class="pref-modal">
+            <div class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></div>
+            <h2>Hey! Are you looking for help in planning your trip?</h2>
+            
+            <div class="options-list">
+                <div class="option-item" onclick="selectOption(this, 'Romantic')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">Yes! A romantic trip</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 'Family')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">Yes! For a family trip</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 'Honeymoon')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">Yes! A honeymoon trip</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 'Friends')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">Yes! For a trip with my friends</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 'Group')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">For a group trip</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 'Solo')">
+                    <div class="option-dot"></div>
+                    <span class="option-text">For a solo trip</span>
+                </div>
+            </div>
+
+            <button class="btn-next" onclick="submitPreference()">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
     </div>
 
@@ -213,13 +369,15 @@
 
         const updateProgress = () => {
             if (currentStep < statusItems.length) {
+                const statusText = statusItems[currentStep] || "Finalizing details...";
+                
                 // Update Sub Status with Fade
                 gsap.to(subStatus, {
                     opacity: 0,
                     y: -10,
                     duration: 0.3,
                     onComplete: () => {
-                        subStatus.innerText = statusItems[currentStep];
+                        subStatus.innerText = statusText;
                         gsap.to(subStatus, { opacity: 1, y: 0, duration: 0.3 });
                     }
                 });
@@ -233,20 +391,75 @@
                 });
 
                 currentStep++;
-                setTimeout(updateProgress, 1500);
+                
+                // Show modal at 70% progress
+                if (currentStep === Math.floor(statusItems.length * 0.7)) {
+                    setTimeout(showPreferenceModal, 1000);
+                } else {
+                    setTimeout(updateProgress, 1500);
+                }
             } else {
-                // Final Transition
-                gsap.to(".loading-container", {
-                    scale: 0.9,
-                    opacity: 0,
-                    duration: 0.5,
-                    delay: 0.5,
-                    onComplete: () => {
-                        window.location.href = 'hotels.html';
-                    }
-                });
+                completeLoading();
             }
         };
+
+        function showPreferenceModal() {
+            const overlay = document.getElementById('prefModalOverlay');
+            overlay.style.display = 'flex';
+            gsap.from(".pref-modal", {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.5,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        function selectOption(el, value) {
+            document.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
+            el.classList.add('selected');
+            el.dataset.value = value;
+        }
+
+        function submitPreference() {
+            const selected = document.querySelector('.option-item.selected');
+            if (!selected) {
+                // Shake if none selected
+                gsap.to(".pref-modal", { x: 10, duration: 0.1, repeat: 5, yoyo: true });
+                return;
+            }
+
+            const pref = selected.dataset.value;
+            const tripData = JSON.parse(localStorage.getItem('tripData') || '{}');
+            tripData.travelStyle = pref;
+            localStorage.setItem('tripData', JSON.stringify(tripData));
+
+            // Hide modal and resume
+            gsap.to(".modal-overlay", {
+                opacity: 0,
+                duration: 0.4,
+                onComplete: () => {
+                    document.getElementById('prefModalOverlay').style.display = 'none';
+                    updateProgress();
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('prefModalOverlay').style.display = 'none';
+            updateProgress();
+        }
+
+        function completeLoading() {
+            gsap.to(".loading-container", {
+                scale: 0.9,
+                opacity: 0,
+                duration: 0.5,
+                delay: 0.5,
+                onComplete: () => {
+                    window.location.href = 'hotels.html';
+                }
+            });
+        }
 
         // Start the sequence
         setTimeout(updateProgress, 500);
